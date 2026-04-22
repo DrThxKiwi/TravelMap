@@ -44,96 +44,107 @@ interface TeamData {
   alumni: AlumniYear[]
 }
 
+// 默认数据
+const defaultTeamData: TeamData = {
+  pi: {
+    name: { zh: '张三', en: 'Zhang San' },
+    title: { zh: '教授、博士生导师', en: 'Professor, PhD Supervisor' },
+    research: { zh: '化学生物学、药物化学', en: 'Chemical Biology, Medicinal Chemistry' },
+    email: 'zhangsan@pku.edu.cn',
+    photo: ''
+  },
+  phdStudents: [
+    {
+      name: { zh: '李四', en: 'Li Si' },
+      year: '2023',
+      direction: { zh: '化学生物学探针', en: 'Chemical Biology Probes' },
+      photo: ''
+    },
+    {
+      name: { zh: '王五', en: 'Wang Wu' },
+      year: '2022',
+      direction: { zh: '天然产物全合成', en: 'Total Synthesis of Natural Products' },
+      photo: ''
+    },
+    {
+      name: { zh: '赵六', en: 'Zhao Liu' },
+      year: '2021',
+      direction: { zh: '创新药物设计', en: 'Innovative Drug Design' },
+      photo: ''
+    }
+  ],
+  masterStudents: [
+    {
+      name: { zh: '钱七', en: 'Qian Qi' },
+      year: '2024',
+      direction: { zh: '化学生物学', en: 'Chemical Biology' },
+      photo: ''
+    },
+    {
+      name: { zh: '孙八', en: 'Sun Ba' },
+      year: '2023',
+      direction: { zh: '药物化学', en: 'Medicinal Chemistry' },
+      photo: ''
+    }
+  ],
+  alumni: [
+    {
+      year: '2025',
+      members: [
+        {
+          name: { zh: '周九', en: 'Zhou Jiu' },
+          degree: { zh: '博士', en: 'PhD' },
+          goal: { zh: '清华大学助理教授', en: 'Assistant Professor at Tsinghua University' },
+          photo: ''
+        }
+      ]
+    },
+    {
+      year: '2024',
+      members: [
+        {
+          name: { zh: '吴十', en: 'Wu Shi' },
+          degree: { zh: '博士', en: 'PhD' },
+          goal: { zh: '上海药物研究所研究员', en: 'Researcher at Shanghai Institute of Materia Medica' },
+          photo: ''
+        },
+        {
+          name: { zh: '郑十一', en: 'Zheng Shiyi' },
+          degree: { zh: '硕士', en: 'Master' },
+          goal: { zh: '美国斯坦福大学博士', en: 'PhD Candidate at Stanford University' },
+          photo: ''
+        }
+      ]
+    }
+  ]
+}
+
 // 从API获取团队数据
 async function fetchTeamData(): Promise<TeamData> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+    
+    if (!baseUrl) {
+      console.log('NEXT_PUBLIC_BASE_URL not set, using default data')
+      return defaultTeamData
+    }
+    
     const response = await fetch(`${baseUrl}/api/admin?action=getTeam`, {
       next: { revalidate: 600 } // 10分钟重新生成
     })
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
     const data = await response.json()
     
-    if (data.success) {
-      return data.data
-    }
+    if (data.success) {return data.data}
   } catch (error) {
     console.error('Failed to fetch team data:', error)
   }
   
-  // 默认数据
-  return {
-    pi: {
-      name: { zh: '张三', en: 'Zhang San' },
-      title: { zh: '教授、博士生导师', en: 'Professor, PhD Supervisor' },
-      research: { zh: '化学生物学、药物化学', en: 'Chemical Biology, Medicinal Chemistry' },
-      email: 'zhangsan@pku.edu.cn',
-      photo: ''
-    },
-    phdStudents: [
-      {
-        name: { zh: '李四', en: 'Li Si' },
-        year: '2023',
-        direction: { zh: '化学生物学探针', en: 'Chemical Biology Probes' },
-        photo: ''
-      },
-      {
-        name: { zh: '王五', en: 'Wang Wu' },
-        year: '2022',
-        direction: { zh: '天然产物全合成', en: 'Total Synthesis of Natural Products' },
-        photo: ''
-      },
-      {
-        name: { zh: '赵六', en: 'Zhao Liu' },
-        year: '2021',
-        direction: { zh: '创新药物设计', en: 'Innovative Drug Design' },
-        photo: ''
-      }
-    ],
-    masterStudents: [
-      {
-        name: { zh: '钱七', en: 'Qian Qi' },
-        year: '2024',
-        direction: { zh: '化学生物学', en: 'Chemical Biology' },
-        photo: ''
-      },
-      {
-        name: { zh: '孙八', en: 'Sun Ba' },
-        year: '2023',
-        direction: { zh: '药物化学', en: 'Medicinal Chemistry' },
-        photo: ''
-      }
-    ],
-    alumni: [
-      {
-        year: '2025',
-        members: [
-          {
-            name: { zh: '周九', en: 'Zhou Jiu' },
-            degree: { zh: '博士', en: 'PhD' },
-            goal: { zh: '清华大学助理教授', en: 'Assistant Professor at Tsinghua University' },
-            photo: ''
-          }
-        ]
-      },
-      {
-        year: '2024',
-        members: [
-          {
-            name: { zh: '吴十', en: 'Wu Shi' },
-            degree: { zh: '博士', en: 'PhD' },
-            goal: { zh: '上海药物研究所研究员', en: 'Researcher at Shanghai Institute of Materia Medica' },
-            photo: ''
-          },
-          {
-            name: { zh: '郑十一', en: 'Zheng Shiyi' },
-            degree: { zh: '硕士', en: 'Master' },
-            goal: { zh: '美国斯坦福大学博士', en: 'PhD Candidate at Stanford University' },
-            photo: ''
-          }
-        ]
-      }
-    ]
-  }
+  return defaultTeamData
 }
 
 const TeamPage = async () => {

@@ -44,13 +44,101 @@ interface AboutData {
   honors: Honor[]
 }
 
+// 默认数据
+const defaultAboutData: AboutData = {
+  name: { zh: '张三', en: 'Zhang San' },
+  title: { zh: '教授、博士生导师', en: 'Professor, PhD Supervisor' },
+  college: { zh: '北京大学化学学院', en: 'College of Chemistry, Peking University' },
+  researchField: { zh: '化学生物学、药物化学', en: 'Chemical Biology, Medicinal Chemistry' },
+  office: { zh: '北京市海淀区颐和园路5号化学楼A区301室', en: 'Room 301, Building A, Chemistry Building, No. 5 Yiheyuan Road, Haidian District, Beijing' },
+  email: 'zhangsan@pku.edu.cn',
+  photo: '',
+  education: [
+    {
+      id: 1,
+      period: '2005-2010',
+      institution: { zh: '哈佛大学', en: 'Harvard University' },
+      degree: { zh: '博士', en: 'PhD' },
+      major: { zh: '化学', en: 'Chemistry' }
+    },
+    {
+      id: 2,
+      period: '2001-2005',
+      institution: { zh: '北京大学', en: 'Peking University' },
+      degree: { zh: '学士', en: 'Bachelor' },
+      major: { zh: '化学', en: 'Chemistry' }
+    }
+  ],
+  workExperience: [
+    {
+      id: 1,
+      period: '2015-至今',
+      organization: { zh: '北京大学化学学院', en: 'College of Chemistry, Peking University' },
+      position: { zh: '教授', en: 'Professor' }
+    },
+    {
+      id: 2,
+      period: '2010-2015',
+      organization: { zh: '斯坦福大学', en: 'Stanford University' },
+      position: { zh: '博士后研究员', en: 'Postdoctoral Researcher' }
+    }
+  ],
+  academicPositions: [
+    {
+      id: 1,
+      position: { zh: '《化学学报》编委', en: 'Editorial Board Member, Acta Chimica Sinica' }
+    },
+    {
+      id: 2,
+      position: { zh: '中国化学会化学生物学专业委员会委员', en: 'Member, Chemical Biology Committee, Chinese Chemical Society' }
+    },
+    {
+      id: 3,
+      position: { zh: '国家自然科学基金评审专家', en: 'Reviewer, National Natural Science Foundation of China' }
+    }
+  ],
+  honors: [
+    {
+      id: 1,
+      honor: { zh: '国家自然科学二等奖', en: 'National Natural Science Award (Second Class)' },
+      year: '2025'
+    },
+    {
+      id: 2,
+      honor: { zh: '教育部自然科学一等奖', en: 'Ministry of Education Natural Science Award (First Class)' },
+      year: '2023'
+    },
+    {
+      id: 3,
+      honor: { zh: '国家杰出青年科学基金', en: 'National Outstanding Youth Science Fund' },
+      year: '2020'
+    },
+    {
+      id: 4,
+      honor: { zh: '中国化学会青年化学奖', en: 'Chinese Chemical Society Young Chemist Award' },
+      year: '2018'
+    }
+  ]
+}
+
 // 从API获取个人简介数据
 async function fetchAboutData(): Promise<AboutData> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+    
+    if (!baseUrl) {
+      console.log('NEXT_PUBLIC_BASE_URL not set, using default data')
+      return defaultAboutData
+    }
+    
     const response = await fetch(`${baseUrl}/api/admin?action=getAbout`, {
       next: { revalidate: 600 } // 10分钟重新生成
     })
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
     const data = await response.json()
     
     if (data.success) {
@@ -60,82 +148,7 @@ async function fetchAboutData(): Promise<AboutData> {
     console.error('Failed to fetch about data:', error)
   }
   
-  // 默认数据
-  return {
-    name: { zh: '张三', en: 'Zhang San' },
-    title: { zh: '教授、博士生导师', en: 'Professor, PhD Supervisor' },
-    college: { zh: '北京大学化学学院', en: 'College of Chemistry, Peking University' },
-    researchField: { zh: '化学生物学、药物化学', en: 'Chemical Biology, Medicinal Chemistry' },
-    office: { zh: '北京市海淀区颐和园路5号化学楼A区301室', en: 'Room 301, Building A, Chemistry Building, No. 5 Yiheyuan Road, Haidian District, Beijing' },
-    email: 'zhangsan@pku.edu.cn',
-    photo: '',
-    education: [
-      {
-        id: 1,
-        period: '2005-2010',
-        institution: { zh: '哈佛大学', en: 'Harvard University' },
-        degree: { zh: '博士', en: 'PhD' },
-        major: { zh: '化学', en: 'Chemistry' }
-      },
-      {
-        id: 2,
-        period: '2001-2005',
-        institution: { zh: '北京大学', en: 'Peking University' },
-        degree: { zh: '学士', en: 'Bachelor' },
-        major: { zh: '化学', en: 'Chemistry' }
-      }
-    ],
-    workExperience: [
-      {
-        id: 1,
-        period: '2015-至今',
-        organization: { zh: '北京大学化学学院', en: 'College of Chemistry, Peking University' },
-        position: { zh: '教授', en: 'Professor' }
-      },
-      {
-        id: 2,
-        period: '2010-2015',
-        organization: { zh: '斯坦福大学', en: 'Stanford University' },
-        position: { zh: '博士后研究员', en: 'Postdoctoral Researcher' }
-      }
-    ],
-    academicPositions: [
-      {
-        id: 1,
-        position: { zh: '《化学学报》编委', en: 'Editorial Board Member, Acta Chimica Sinica' }
-      },
-      {
-        id: 2,
-        position: { zh: '中国化学会化学生物学专业委员会委员', en: 'Member, Chemical Biology Committee, Chinese Chemical Society' }
-      },
-      {
-        id: 3,
-        position: { zh: '国家自然科学基金评审专家', en: 'Reviewer, National Natural Science Foundation of China' }
-      }
-    ],
-    honors: [
-      {
-        id: 1,
-        honor: { zh: '国家自然科学二等奖', en: 'National Natural Science Award (Second Class)' },
-        year: '2025'
-      },
-      {
-        id: 2,
-        honor: { zh: '教育部自然科学一等奖', en: 'Ministry of Education Natural Science Award (First Class)' },
-        year: '2023'
-      },
-      {
-        id: 3,
-        honor: { zh: '国家杰出青年科学基金', en: 'National Outstanding Youth Science Fund' },
-        year: '2020'
-      },
-      {
-        id: 4,
-        honor: { zh: '中国化学会青年化学奖', en: 'Chinese Chemical Society Young Chemist Award' },
-        year: '2018'
-      }
-    ]
-  }
+  return defaultAboutData
 }
 
 const AboutPage = async () => {
