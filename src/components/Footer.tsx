@@ -32,8 +32,12 @@ const Footer = () => {
       try {
         const response = await fetch('/api/admin?action=getNavigation')
         const result = await response.json()
-        if (result.success) {
-          setFooterData(result.data.footer)
+        if (result.success && result.data && result.data.footer) {
+          // 安全地合并数据
+          setFooterData(prev => ({
+            ...prev,
+            ...result.data.footer
+          }))
         }
       } catch (error) {
         console.error('Failed to fetch footer data:', error)
@@ -51,23 +55,48 @@ const Footer = () => {
     return null // 或者返回一个加载指示器
   }
 
+  // 安全地获取数据
+  const safeGet = (obj: any, path: string, defaultValue: any = '') => {
+    const keys = path.split('.')
+    let result = obj
+    for (const key of keys) {
+      if (result == null) return defaultValue
+      result = result[key]
+    }
+    return result ?? defaultValue
+  }
+
+  const safeGetLocale = (obj: any, path: string) => {
+    const value = safeGet(obj, path, { zh: '', en: '' })
+    return value && value[locale] ? value[locale] : safeGet(obj, path + 'Zh', '')
+  }
+
+  const safeQuickLinks = safeGet(footerData, 'quickLinks', [
+    { id: 1, name: { zh: '首页', en: 'Home' }, href: '/' },
+    { id: 2, name: { zh: '个人简介', en: 'About' }, href: '/about' },
+    { id: 3, name: { zh: '研究方向', en: 'Research' }, href: '/research' },
+    { id: 4, name: { zh: '联系我们', en: 'Contact' }, href: '/contact' }
+  ])
+
   return (
     <footer className="bg-gray-100 border-t border-gray-200 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="text-lg font-bold text-primary mb-4">{footerData.groupInfo.name[locale as keyof typeof footerData.groupInfo.name]}</h3>
+            <h3 className="text-lg font-bold text-primary mb-4">
+              {safeGetLocale(footerData, 'groupInfo.name') || '学术课题组'}
+            </h3>
             <p className="text-sm text-gray-600">
-              {footerData.groupInfo.college[locale as keyof typeof footerData.groupInfo.college]}
+              {safeGetLocale(footerData, 'groupInfo.college') || '北京大学化学学院'}
             </p>
           </div>
           <div>
             <h3 className="text-sm font-bold text-gray-700 mb-4">快速链接</h3>
             <ul className="space-y-2 text-sm">
-              {footerData.quickLinks.map((link) => (
-                <li key={link.id}>
-                  <Link href={link.href} className="text-gray-600 hover:text-primary">
-                    {link.name[locale as keyof typeof link.name]}
+              {safeQuickLinks.map((link: any) => (
+                <li key={link.id || link.href}>
+                  <Link href={link.href || '/'} className="text-gray-600 hover:text-primary">
+                    {safeGetLocale(link, 'name') || safeGet(link, 'label.' + locale, '链接')}
                   </Link>
                 </li>
               ))}
@@ -76,15 +105,15 @@ const Footer = () => {
           <div>
             <h3 className="text-sm font-bold text-gray-700 mb-4">联系信息</h3>
             <p className="text-sm text-gray-600 mb-2">
-              地址：{footerData.contactInfo.address[locale as keyof typeof footerData.contactInfo.address]}
+              地址：{safeGetLocale(footerData, 'contactInfo.address') || '北京市海淀区颐和园路5号'}
             </p>
             <p className="text-sm text-gray-600">
-              邮箱：{footerData.contactInfo.email}
+              邮箱：{safeGet(footerData, 'contactInfo.email', 'contact@example.com')}
             </p>
           </div>
         </div>
         <div className="mt-8 pt-8 border-t border-gray-200 text-center text-sm text-gray-500">
-          <p>{footerData.copyright[locale as keyof typeof footerData.copyright]}</p>
+          <p>{safeGetLocale(footerData, 'copyright') || '© 2026 化学生物学与药物化学课题组. 保留所有权利.'}</p>
         </div>
       </div>
     </footer>

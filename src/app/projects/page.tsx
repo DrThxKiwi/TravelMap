@@ -105,10 +105,10 @@ const ProjectsPage = () => {
       try {
         const response = await fetch('/api/admin?action=getProjects')
         const data = await response.json()
-        if (data.success) {
+        if (data.success && data.data) {
           // 直接使用API返回的ongoing和completed数组
-          const ongoing = data.data.ongoing || []
-          const completed = data.data.completed || []
+          const ongoing = data.data.ongoing || projects.ongoing
+          const completed = data.data.completed || projects.completed
           setProjects({ ongoing, completed })
         }
       } catch (error) {
@@ -124,6 +124,19 @@ const ProjectsPage = () => {
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">加载中...</div>
   }
+
+  // 安全获取数据
+  const safeGetLocale = (obj: any, defaultValue: string = '') => {
+    if (!obj) return defaultValue
+    if (obj[locale]) return obj[locale]
+    return defaultValue
+  }
+
+  const safeArray = (arr: any) => {
+    return Array.isArray(arr) ? arr : []
+  }
+
+  const currentProjects = activeTab === 'ongoing' ? safeArray(projects.ongoing) : safeArray(projects.completed)
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -151,24 +164,24 @@ const ProjectsPage = () => {
 
       {/* 项目列表 */}
       <div className="space-y-6">
-        {(activeTab === 'ongoing' ? projects.ongoing : projects.completed).map((project) => (
-          <div key={project.id} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+        {currentProjects.map((project: any, index: number) => (
+          <div key={project?.id || index} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
             <h2 className="text-xl font-bold text-gray-800 mb-4">
-              {project.name[locale as keyof typeof project.name]}
+              {safeGetLocale(project?.name, '项目 ' + (index + 1))}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
                 <p className="text-gray-700 mb-2">
                   <span className="font-bold">{locale === 'zh' ? '项目编号：' : 'Project Number: '}</span>
-                  {project.number}
+                  {project?.number || 'N/A'}
                 </p>
                 <p className="text-gray-700 mb-2">
                   <span className="font-bold">{locale === 'zh' ? '起止时间：' : 'Period: '}</span>
-                  {project.period}
+                  {project?.period || 'N/A'}
                 </p>
                 <p className="text-gray-700">
                   <span className="font-bold">{locale === 'zh' ? '承担角色：' : 'Role: '}</span>
-                  {project.role[locale as keyof typeof project.role]}
+                  {safeGetLocale(project?.role, 'N/A')}
                 </p>
               </div>
             </div>
@@ -177,7 +190,7 @@ const ProjectsPage = () => {
                 {locale === 'zh' ? '项目核心内容' : 'Core Content'}
               </h3>
               <p className="text-gray-700 leading-relaxed">
-                {project.content[locale as keyof typeof project.content]}
+                {safeGetLocale(project?.content, '项目内容')}
               </p>
             </div>
             <div>
@@ -185,7 +198,7 @@ const ProjectsPage = () => {
                 {locale === 'zh' ? '研究成果简述' : 'Achievements'}
               </h3>
               <p className="text-gray-700 leading-relaxed">
-                {project.achievements[locale as keyof typeof project.achievements]}
+                {safeGetLocale(project?.achievements, '研究成果')}
               </p>
             </div>
           </div>

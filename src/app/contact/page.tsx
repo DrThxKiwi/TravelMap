@@ -23,7 +23,7 @@ const ContactPage = () => {
       try {
         const response = await fetch('/api/admin?action=getContact')
         const data = await response.json()
-        if (data.success) {
+        if (data.success && data.data) {
           setContactData(data.data)
         }
       } catch (error) {
@@ -38,6 +38,13 @@ const ContactPage = () => {
 
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">加载中...</div>
+  }
+
+  // 安全获取数据
+  const safeGetLocale = (obj: any, defaultValue: string = '') => {
+    if (!obj) return defaultValue
+    if (obj[locale]) return obj[locale]
+    return defaultValue
   }
 
   return (
@@ -58,7 +65,7 @@ const ContactPage = () => {
                 {locale === 'zh' ? '工作邮箱' : 'Email'}
               </h3>
               <p className="text-gray-600">
-                {contactData.email}
+                {contactData?.email || 'email@example.com'}
               </p>
             </div>
             <div>
@@ -66,7 +73,7 @@ const ContactPage = () => {
                 {locale === 'zh' ? '单位实验室地址' : 'Laboratory Address'}
               </h3>
               <p className="text-gray-600">
-                {contactData.address[locale]}
+                {safeGetLocale(contactData?.address, '地址')}
               </p>
             </div>
           </div>

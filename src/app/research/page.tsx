@@ -47,7 +47,7 @@ const ResearchPage = () => {
         },
         methods: {
           zh: '有机合成、不对称催化、串联反应、天然产物分离鉴定、结构解析',
-          en: 'Organic synthesis, asymmetric catalysis, cascade reactions, natural product isolation and identification, structural analysis'
+          en: 'Organic synthesis, asymmetric catalysis, tandem reactions, natural product isolation and identification, structural analysis'
         },
         applications: {
           zh: '为药物研发提供候选化合物，为天然产物生物合成研究提供参考。目标是开发具有临床应用潜力的天然产物衍生物。',
@@ -80,19 +80,16 @@ const ResearchPage = () => {
   })
 
   useEffect(() => {
-    // 从API加载数据
+    // 从API获取数据
     const fetchData = async () => {
       try {
         const response = await fetch('/api/admin?action=getResearch')
         const data = await response.json()
-        if (data.success) {
-          setResearchData({
-            overview: data.data.overview || {
-              zh: '本课题组致力于化学生物学与药物化学的交叉研究，围绕生命过程中的分子机制和疾病治疗靶点，开展基础研究和应用研究。通过发展新型化学工具和方法，我们旨在深入理解生物分子的功能与调控机制，为重大疾病的诊断和治疗提供新的策略和方案，推动化学学科与生命科学、医学的交叉融合。',
-              en: 'Our research group is dedicated to interdisciplinary research in chemical biology and medicinal chemistry, focusing on molecular mechanisms in life processes and disease therapeutic targets, conducting both basic and applied research. By developing novel chemical tools and methods, we aim to deeply understand the functions and regulatory mechanisms of biomolecules, provide new strategies and solutions for the diagnosis and treatment of major diseases, and promote the integration of chemistry with life sciences and medicine.'
-            },
-            directions: data.data.directions || []
-          })
+        if (data.success && data.data) {
+          setResearchData(prev => ({
+            overview: data.data.overview || prev.overview,
+            directions: data.data.directions || prev.directions
+          }))
         }
       } catch (error) {
         console.error('Failed to fetch research data:', error)
@@ -100,13 +97,22 @@ const ResearchPage = () => {
         setLoading(false)
       }
     }
-    
+
     fetchData()
   }, [])
 
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">加载中...</div>
   }
+
+  // 安全获取数据
+  const safeGetLocale = (obj: any, defaultValue: string = '') => {
+    if (!obj) return defaultValue
+    if (obj[locale]) return obj[locale]
+    return defaultValue
+  }
+
+  const safeDirections = Array.isArray(researchData.directions) ? researchData.directions : []
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -120,16 +126,16 @@ const ResearchPage = () => {
           {locale === 'zh' ? '研究定位与意义' : 'Research Positioning and Significance'}
         </h2>
         <p className="text-gray-700 leading-relaxed">
-          {researchData.overview[locale]}
+          {safeGetLocale(researchData.overview, '本课题组致力于化学生物学与药物化学的交叉研究。')}
         </p>
       </div>
 
       {/* 核心研究方向 */}
       <div className="space-y-8 mb-12">
-        {researchData.directions.map((direction) => (
-          <div key={direction.id} className="bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
+        {safeDirections.map((direction: any, index: number) => (
+          <div key={direction?.id || index} className="bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
             <h2 className="text-2xl font-bold text-primary mb-6">
-              {direction.name[locale as keyof typeof direction.name]}
+              {safeGetLocale(direction?.name, '研究方向 ' + (index + 1))}
             </h2>
             
             <div className="flex flex-col md:flex-row gap-8">
@@ -139,7 +145,7 @@ const ResearchPage = () => {
                     {locale === 'zh' ? '研究背景' : 'Research Background'}
                   </h3>
                   <p className="text-gray-700 leading-relaxed">
-                    {direction.background[locale as keyof typeof direction.background]}
+                    {safeGetLocale(direction?.background, '研究背景内容')}
                   </p>
                 </div>
                 
@@ -148,7 +154,7 @@ const ResearchPage = () => {
                     {locale === 'zh' ? '核心研究内容' : 'Core Research Content'}
                   </h3>
                   <p className="text-gray-700 leading-relaxed">
-                    {direction.content[locale as keyof typeof direction.content]}
+                    {safeGetLocale(direction?.content, '核心研究内容')}
                   </p>
                 </div>
                 
@@ -157,7 +163,7 @@ const ResearchPage = () => {
                     {locale === 'zh' ? '关键技术方法' : 'Key Technical Methods'}
                   </h3>
                   <p className="text-gray-700 leading-relaxed">
-                    {direction.methods[locale as keyof typeof direction.methods]}
+                    {safeGetLocale(direction?.methods, '关键技术方法')}
                   </p>
                 </div>
                 
@@ -166,17 +172,17 @@ const ResearchPage = () => {
                     {locale === 'zh' ? '应用场景与研究目标' : 'Application Scenarios and Research Goals'}
                   </h3>
                   <p className="text-gray-700 leading-relaxed">
-                    {direction.applications[locale as keyof typeof direction.applications]}
+                    {safeGetLocale(direction?.applications, '应用场景与研究目标')}
                   </p>
                 </div>
               </div>
               
               <div className="w-full md:w-1/3">
-                {direction.image ? (
+                {direction?.image ? (
                   <div className="aspect-video rounded-lg overflow-hidden border border-gray-200 h-full">
                     <img 
                       src={direction.image} 
-                      alt={direction.name[locale as keyof typeof direction.name]} 
+                      alt={safeGetLocale(direction?.name, '研究方向')} 
                       className="w-full h-full object-cover"
                     />
                   </div>
