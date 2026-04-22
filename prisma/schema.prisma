@@ -1,0 +1,224 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Admin {
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  password String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Homepage {
+  id               Int      @id @default(autoincrement())
+  groupNameZh      String
+  groupNameEn      String
+  piNameZh         String
+  piNameEn         String
+  collegeZh        String
+  collegeEn        String
+  addressZh        String
+  addressEn        String
+  researchOverviewZh String
+  researchOverviewEn String
+  researchDirectionsZh String?
+  researchDirectionsEn String?
+  researchImage    String?
+  news             News[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model News {
+  id          Int      @id @default(autoincrement())
+  homepageId  Int
+  homepage    Homepage @relation(fields: [homepageId], references: [id])
+  date        String
+  titleZh     String
+  titleEn     String
+  descriptionZh String
+  descriptionEn String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model About {
+  id           Int      @id @default(autoincrement())
+  nameZh       String
+  nameEn       String
+  titleZh      String
+  titleEn      String
+  collegeZh    String
+  collegeEn    String
+  researchFieldZh String
+  researchFieldEn String
+  officeZh     String
+  officeEn     String
+  email        String
+  photo        String?
+  education    Education[]
+  workExperience WorkExperience[]
+  academicPosition AcademicPosition[]
+  honor        Honor[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Education {
+  id           Int      @id @default(autoincrement())
+  aboutId      Int
+  about        About    @relation(fields: [aboutId], references: [id])
+  period       String
+  institutionZh String
+  institutionEn String
+  degreeZh     String
+  degreeEn     String
+  majorZh      String
+  majorEn      String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model WorkExperience {
+  id            Int      @id @default(autoincrement())
+  aboutId       Int
+  about         About    @relation(fields: [aboutId], references: [id])
+  period        String
+  organizationZh String
+  organizationEn String
+  positionZh    String
+  positionEn    String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model AcademicPosition {
+  id          Int      @id @default(autoincrement())
+  aboutId     Int
+  about       About    @relation(fields: [aboutId], references: [id])
+  positionZh  String
+  positionEn  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Honor {
+  id         Int      @id @default(autoincrement())
+  aboutId    Int
+  about      About    @relation(fields: [aboutId], references: [id])
+  honorZh    String
+  honorEn    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model ResearchDirection {
+  id             Int      @id @default(autoincrement())
+  nameZh         String
+  nameEn         String
+  backgroundZh   String
+  backgroundEn   String
+  contentZh      String
+  contentEn      String
+  methodsZh      String
+  methodsEn      String
+  applicationsZh String
+  applicationsEn String
+  image          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model TeamMember {
+  id          Int      @id @default(autoincrement())
+  type        String   // pi, phd, master, alumni
+  nameZh      String
+  nameEn      String
+  titleZh     String?
+  titleEn     String?
+  researchZh  String?
+  researchEn  String?
+  photo       String?
+  grade       String?
+  graduationYear String?
+  degreeZh    String?
+  degreeEn    String?
+  destinationZh String?
+  destinationEn String?
+  email       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Project {
+  id            Int      @id @default(autoincrement())
+  status        String   // ongoing, completed
+  nameZh        String
+  nameEn        String
+  number        String
+  period        String
+  roleZh        String
+  roleEn        String
+  contentZh     String
+  contentEn     String
+  achievementsZh String
+  achievementsEn String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Publication {
+  id             Int      @id @default(autoincrement())
+  authorsZh      String
+  authorsEn      String
+  titleZh        String
+  titleEn        String
+  journalZh      String
+  journalEn      String
+  year           String
+  volume         String
+  pages          String
+  doi            String
+  isRepresentative Boolean
+  isHighImpact   Boolean
+  pdfLink        String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Facility {
+  id         Int      @id @default(autoincrement())
+  category   String   // synthesis, characterization, testing, other
+  nameZh     String
+  nameEn     String
+  shareable  Boolean
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Contact {
+  id           Int      @id @default(autoincrement())
+  email        String
+  addressZh    String
+  addressEn    String
+  lat          String
+  lng          String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Navigation {
+  id        Int      @id @default(autoincrement())
+  data      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

@@ -1,0 +1,36 @@
+{
+  "common": {
+    "home": "首页",
+    "about": "个人简介",
+    "research": "研究方向",
+    "team": "研究团队",
+    "projects": "科研项目",
+    "publications": "学术论文",
+    "facilities": "实验平台",
+    "contact": "联系我们",
+    "admin": "管理员",
+    "login": "登录",
+    "logout": "退出登录",
+    "username": "用户名",
+    "password": "密码",
+    "submit": "提交",
+    "cancel": "取消",
+    "success": "成功",
+    "error": "错误",
+    "loading": "加载中..."
+  },
+  "navbar": {
+    "title": "学术课题组"
+  },
+  "footer": {
+    "address": "北京市海淀区颐和园路5号",
+    "email": "contact@example.com",
+    "copyright": "© {year} 学术课题组. 保留所有权利."
+  },
+  "login": {
+    "title": "管理员登录",
+    "subtitle": "请输入您的用户名和密码",
+    "invalidCredentials": "用户名或密码错误",
+    "loginSuccess": "登录成功"
+  }
+}

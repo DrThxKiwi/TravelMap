@@ -1,0 +1,36 @@
+{
+  "common": {
+    "home": "Home",
+    "about": "About",
+    "research": "Research",
+    "team": "Team",
+    "projects": "Projects",
+    "publications": "Publications",
+    "facilities": "Facilities",
+    "contact": "Contact",
+    "admin": "Admin",
+    "login": "Login",
+    "logout": "Logout",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "success": "Success",
+    "error": "Error",
+    "loading": "Loading..."
+  },
+  "navbar": {
+    "title": "Academic Research Group"
+  },
+  "footer": {
+    "address": "No. 5 Yiheyuan Road, Haidian District, Beijing",
+    "email": "contact@example.com",
+    "copyright": "© {year} Academic Research Group. All rights reserved."
+  },
+  "login": {
+    "title": "Admin Login",
+    "subtitle": "Please enter your username and password",
+    "invalidCredentials": "Invalid username or password",
+    "loginSuccess": "Login successful"
+  }
+}
