@@ -35,13 +35,57 @@ const quickLinks = [
   { href: '/admin/login', icon: '🔐', label: { zh: '管理员', en: 'Admin' } }
 ]
 
+// 默认数据
+const defaultHomepageData: HomepageData = {
+  groupName: { zh: '化学生物学与药物化学课题组', en: 'Chemical Biology and Medicinal Chemistry Research Group' },
+  piName: { zh: '张三 教授', en: 'Prof. Zhang San' },
+  college: { zh: '北京大学化学学院', en: 'College of Chemistry, Peking University' },
+  address: { zh: '北京市海淀区颐和园路5号', en: 'No. 5 Yiheyuan Road, Haidian District, Beijing' },
+  researchOverview: { zh: '我们致力于化学生物学与药物化学的交叉研究，探索生命过程中的分子机制，开发新型治疗药物。', en: 'We are dedicated to interdisciplinary research in chemical biology and medicinal chemistry, exploring molecular mechanisms in life processes and developing novel therapeutic drugs.' },
+  researchDirections: { zh: '主要研究方向包括：天然产物全合成、化学生物学探针开发、药物靶点发现与验证、创新药物设计与合成。', en: 'Our main research directions include: total synthesis of natural products, development of chemical biology probes, drug target discovery and validation, and innovative drug design and synthesis.' },
+  researchImage: '',
+  news: [
+    {
+      id: 1,
+      date: '2026-04-15',
+      title: { zh: '课题组在Nature发表重要研究成果', en: 'Research group publishes important findings in Nature' },
+      description: { zh: '关于新型催化剂的研究取得重大突破', en: 'Major breakthrough in novel catalyst research' }
+    },
+    {
+      id: 2,
+      date: '2026-04-10',
+      title: { zh: 'PI应邀在国际会议上做主旨报告', en: 'PI invited to give keynote speech at international conference' },
+      description: { zh: '在第25届国际化学会议上分享研究成果', en: 'Sharing research results at the 25th International Chemistry Conference' }
+    },
+    {
+      id: 3,
+      date: '2026-04-05',
+      title: { zh: '两名博士生获得国家奖学金', en: 'Two PhD students receive national scholarships' },
+      description: { zh: '表彰他们在研究中的突出贡献', en: 'Recognizing their outstanding contributions to research' }
+    }
+  ]
+}
+
 // 从API获取首页数据
 async function fetchHomepageData(): Promise<HomepageData> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    // 在服务器组件中需要使用完整URL
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+    
+    // 如果环境变量不存在，使用默认数据
+    if (!baseUrl) {
+      console.log('NEXT_PUBLIC_BASE_URL not set, using default data')
+      return defaultHomepageData
+    }
+    
     const response = await fetch(`${baseUrl}/api/admin?action=getHomepage`, {
       next: { revalidate: 600 } // 10分钟重新生成
     })
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
     const data = await response.json()
     
     if (data.success) {
@@ -51,36 +95,8 @@ async function fetchHomepageData(): Promise<HomepageData> {
     console.error('Failed to fetch homepage data:', error)
   }
   
-  // 默认数据
-  return {
-    groupName: { zh: '化学生物学与药物化学课题组', en: 'Chemical Biology and Medicinal Chemistry Research Group' },
-    piName: { zh: '张三 教授', en: 'Prof. Zhang San' },
-    college: { zh: '北京大学化学学院', en: 'College of Chemistry, Peking University' },
-    address: { zh: '北京市海淀区颐和园路5号', en: 'No. 5 Yiheyuan Road, Haidian District, Beijing' },
-    researchOverview: { zh: '我们致力于化学生物学与药物化学的交叉研究，探索生命过程中的分子机制，开发新型治疗药物。', en: 'We are dedicated to interdisciplinary research in chemical biology and medicinal chemistry, exploring molecular mechanisms in life processes and developing novel therapeutic drugs.' },
-    researchDirections: { zh: '主要研究方向包括：天然产物全合成、化学生物学探针开发、药物靶点发现与验证、创新药物设计与合成。', en: 'Our main research directions include: total synthesis of natural products, development of chemical biology probes, drug target discovery and validation, and innovative drug design and synthesis.' },
-    researchImage: '',
-    news: [
-      {
-        id: 1,
-        date: '2026-04-15',
-        title: { zh: '课题组在Nature发表重要研究成果', en: 'Research group publishes important findings in Nature' },
-        description: { zh: '关于新型催化剂的研究取得重大突破', en: 'Major breakthrough in novel catalyst research' }
-      },
-      {
-        id: 2,
-        date: '2026-04-10',
-        title: { zh: 'PI应邀在国际会议上做主旨报告', en: 'PI invited to give keynote speech at international conference' },
-        description: { zh: '在第25届国际化学会议上分享研究成果', en: 'Sharing research results at the 25th International Chemistry Conference' }
-      },
-      {
-        id: 3,
-        date: '2026-04-05',
-        title: { zh: '两名博士生获得国家奖学金', en: 'Two PhD students receive national scholarships' },
-        description: { zh: '表彰他们在研究中的突出贡献', en: 'Recognizing their outstanding contributions to research' }
-      }
-    ]
-  }
+  // 返回默认数据
+  return defaultHomepageData
 }
 
 const HomePage = async () => {
